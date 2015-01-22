@@ -1,0 +1,20 @@
+<ion-view view-title="Recordar">
+    <ion-content>
+        <h4 class="padding">Queremos hacer tu vida más sencilla, por esto, si quieres que nuestra App recuerde tu número de identificación cada que ingreses por favor selecciona "Recordar mi cédula"</h4>
+        <form ng-submit="capturarRecordar()">
+            <div class="list">
+                <ul>
+                    <li class="item item-checkbox">
+                        <label class="checkbox">
+                            <input type="checkbox" ng-model="datosInicio.recordar">
+                        </label>
+                        Recordar mi cédula
+                    </li>
+                </ul>
+                <label class="item">
+                    <button class="button button-block button-positive" type="submit">Continuar</button>
+                </label>
+            </div>
+        </form>
+    </ion-content>
+</ion-view>

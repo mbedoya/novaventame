@@ -1,0 +1,35 @@
+<ion-view view-title="Home">
+    <ion-content>
+        <div class="list">
+            <label class="item item-input">
+                <span class="input-label" ng-bind="datosInicio.nombre"></span>
+            </label>
+            <label class="item item-input">
+                <span class="input-label">{{datosInicio.segmento}}</span>
+            </label>
+            <label class="item item-input">
+                <span class="input-label">Saldo a pagar</span>
+                <input type="text" ng-model="datosInicio.saldo">
+            </label>
+            <label class="item item-input">
+                <span class="input-label">Cupo</span>
+                <input type="text" ng-model="datosInicio.cupo">
+            </label>
+            <label class="item item-input">
+                <span class="input-label">Flexibilización</span>
+                <input type="text" ng-model="datosInicio.flexibilizacion">
+            </label>
+            <label class="item item-input">
+                <span class="input-label">&nbsp;</span>
+            </label>
+            <label class="item item-input">
+                <span class="input-label">Campaña</span>
+                <input type="text" ng-model="campana.numero">
+            </label>
+            <label class="item item-input">
+                <span class="input-label">Fecha de Montaje<br /> de Pedido</span>
+                <input type="text" ng-model="campana.fechaMontajePedido">
+            </label>
+        </div>
+    </ion-content>
+</ion-view>
