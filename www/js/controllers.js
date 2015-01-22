@@ -60,19 +60,16 @@ angular.module('starter.controllers', [])
     };
 })
 
-.controller('RecordarCtrl', function($scope, $location, $state) {
+.controller('RecordarCtrl', function($scope, $rootScope, $location, $state, $ionicLoading) {
 
     //Inicializar los datos de inicio
     $scope.datosInicio = {};
 
     $scope.capturarRecordar = function() {
-        console.log('Doing Recordar', $scope.datosInicio);
 
-        $state.go('app.home');
-    };
-})
-
-.controller('HomeCtrl', function($scope, $rootScope) {
+        $scope.loading =  $ionicLoading.show({
+            template: 'Iniciando sesión...'
+        });
 
         $scope.datosInicio = { nombre: '', saldo: 0, cupo: 0, flexibilizacion: 0, segmento: "" };
 
@@ -96,8 +93,11 @@ angular.module('starter.controllers', [])
 
         servicioSoap.invocarMetodo(url, metodo, mensaje, soapAction,
             function(msg) {
+                $ionicLoading.hide();
                 //$.mobile.loading('hide');
             },function (msg) {
+
+                $ionicLoading.hide();
                 //$.mobile.loading('hide');
                 //$.mobile.activePage.find("#mensajeError").html("Error en el proceso de autenticación");
                 //$.mobile.activePage.find("#botonError").trigger("click");
@@ -113,10 +113,10 @@ angular.module('starter.controllers', [])
                 //Usuario válido?
                 if(razonRechazo != null && razonRechazo.length == 0){
 
-                    $scope.datosInicio.nombre = data.getElementsByTagName("nombreCompleto")[0].textContent;
-                    $scope.datosInicio.segmento = data.getElementsByTagName("clasificacionValor")[0].textContent;
-                    $scope.datosInicio.cupo = data.getElementsByTagName("cupo")[0].textContent;
-                    $scope.datosInicio.saldo = data.getElementsByTagName("saldoBalance")[0].textContent;
+                    $rootScope.datos.nombre = data.getElementsByTagName("nombreCompleto")[0].textContent;
+                    $rootScope.datos.segmento = data.getElementsByTagName("clasificacionValor")[0].textContent;
+                    $rootScope.datos.cupo = data.getElementsByTagName("cupo")[0].textContent;
+                    $rootScope.datos.saldo = data.getElementsByTagName("saldoBalance")[0].textContent;
 
                     //Obtener los valores necesarios de usuario
                     //usuario.nombre = data.getElementsByTagName("nombreCompleto")[0].textContent;
@@ -126,44 +126,46 @@ angular.module('starter.controllers', [])
                     var rolValido = false;
 
                     /*
-                    switch(tipoUsuario) {
-                        case config.servicios.antares.constantes.comodin:
-                            usuario.rol = constantes.comodin;
-                            rolValido = true;
-                            break;
-                        case config.servicios.antares.constantes.interno:
-                            usuario.rol = constantes.interno;
-                            rolValido = true;
-                            break;
-                        case config.servicios.antares.constantes.jefeNacional:
-                            usuario.division = data.getElementsByTagName("codigoPais")[0].textContent;
-                            usuario.region = data.getElementsByTagName("codigoRegion")[0].textContent;
-                            usuario.rol = constantes.jefeNacional;
-                            rolValido = true;
-                            break;
-                        case config.servicios.antares.constantes.jefeZonal:
-                            usuario.region = data.getElementsByTagName("codigoRegion")[0].textContent;
-                            usuario.zona = data.getElementsByTagName("codigoZona")[0].textContent;
-                            usuario.rol = constantes.jefeZonal;
-                            rolValido = true;
-                            break;
-                        case config.servicios.antares.constantes.gerenteZona:
-                            usuario.region = data.getElementsByTagName("codigoRegion")[0].textContent;
-                            usuario.zona = data.getElementsByTagName("codigoZona")[0].textContent;
-                            usuario.rol = constantes.gerenteZona;
-                            rolValido = true;
-                            break;
-                        default:
-                            $.mobile.activePage.find("#mensajeError").html("Tu Rol no es válido para la aplicación");
-                            $.mobile.activePage.find("#botonError").trigger("click");
-                            break;
-                    }
+                     switch(tipoUsuario) {
+                     case config.servicios.antares.constantes.comodin:
+                     usuario.rol = constantes.comodin;
+                     rolValido = true;
+                     break;
+                     case config.servicios.antares.constantes.interno:
+                     usuario.rol = constantes.interno;
+                     rolValido = true;
+                     break;
+                     case config.servicios.antares.constantes.jefeNacional:
+                     usuario.division = data.getElementsByTagName("codigoPais")[0].textContent;
+                     usuario.region = data.getElementsByTagName("codigoRegion")[0].textContent;
+                     usuario.rol = constantes.jefeNacional;
+                     rolValido = true;
+                     break;
+                     case config.servicios.antares.constantes.jefeZonal:
+                     usuario.region = data.getElementsByTagName("codigoRegion")[0].textContent;
+                     usuario.zona = data.getElementsByTagName("codigoZona")[0].textContent;
+                     usuario.rol = constantes.jefeZonal;
+                     rolValido = true;
+                     break;
+                     case config.servicios.antares.constantes.gerenteZona:
+                     usuario.region = data.getElementsByTagName("codigoRegion")[0].textContent;
+                     usuario.zona = data.getElementsByTagName("codigoZona")[0].textContent;
+                     usuario.rol = constantes.gerenteZona;
+                     rolValido = true;
+                     break;
+                     default:
+                     $.mobile.activePage.find("#mensajeError").html("Tu Rol no es válido para la aplicación");
+                     $.mobile.activePage.find("#botonError").trigger("click");
+                     break;
+                     }
 
-*/
+                     */
                     if(rolValido){
                         //$.mobile.changePage("#paginaHome", {transition: "none"});
                         //inicializarUsuario();
                     }
+
+                    $state.go('app.home');
 
                 }else{
 
@@ -176,6 +178,16 @@ angular.module('starter.controllers', [])
                 }
             }
         );
+
+
+
+    };
+})
+
+.controller('HomeCtrl', function($scope, $rootScope) {
+
+     $scope.datosInicio = { nombre: $rootScope.datos.nombre, saldo: $rootScope.datos.saldo, cupo: $rootScope.datos.cupo,
+         flexibilizacion: $rootScope.datos.flexibilizacion, segmento: $rootScope.datos.segmento };
 
     //Inicializar los datos de campaña
     $scope.campana = { numero: '01', fechaMontajePedido: 'Febrero 15' };
