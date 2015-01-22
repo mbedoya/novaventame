@@ -5,7 +5,7 @@ angular.module('starter.controllers', [])
   $scope.loginData = {};
 
   // Create the login modal that we will use later
-  $ionicModal.fromTemplateUrl('templates/login.html', {
+  $ionicModal.fromTemplateUrl('templates/error.html', {
     scope: $scope
   }).then(function(modal) {
     $scope.modal = modal;
@@ -74,8 +74,7 @@ angular.module('starter.controllers', [])
 
 .controller('HomeCtrl', function($scope, $rootScope) {
 
-        //Inicializar los datos de inicio
-        $scope.datosInicio = { nombre: 'Ana Isabel', saldo: 275000, cupo: 250000, flexibilizacion: 50000, segmento: "Zafiro", cedula: $rootScope.datos.cedula };
+        $scope.datosInicio = { nombre: '', saldo: 0, cupo: 0, flexibilizacion: 0, segmento: "" };
 
         var url = 'http://190.90.184.23/AntaresWebServices/InterfaceAntaresServiceService';
         var metodo = 'validacionAntares';
@@ -167,8 +166,13 @@ angular.module('starter.controllers', [])
                     }
 
                 }else{
-                    $.mobile.activePage.find("#mensajeError").html(razonRechazo);
-                    $.mobile.activePage.find("#botonError").trigger("click");
+
+
+                    console.log(razonRechazo);
+                    alert("Usuario no valido");
+
+                    //$.mobile.activePage.find("#mensajeError").html(razonRechazo);
+                    //$.mobile.activePage.find("#botonError").trigger("click");
                 }
             }
         );
