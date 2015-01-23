@@ -44,8 +44,56 @@ angular.module('starter.controllers', [])
   ];
 })
 
-.controller('BienvenidaCtrl', function($scope) {
+.controller('InicializacionCtrl', function($scope, $rootScope, $state, $ionicLoading) {
 
+    $scope.loading =  $ionicLoading.show({
+        template: 'Inicializando Aplicación...'
+    });
+
+       var db = new database_js();
+        var myDbUsers;
+        db.initialize();
+
+        //Verificar si el componente de base de datos está disponible
+        if (!db.dbSupport){
+
+            $ionicLoading.hide();
+            console.log(db.supportError);
+            $state.go('app.login');
+
+        }else{
+
+            //Buscar si hay sesión iniciada
+            myDbUsers = new db_user_js(db);
+            myDbUsers.getAll(function(tx, rs){
+
+                //Hay registros en la tabla?
+                if (rs.rows.length){
+
+                    $ionicLoading.hide();
+                    $rootScope.datos.cedula = rs.rows.item(0)['id'];
+                    enviarUbicacion = setInterval(ubicacion, 180000);
+
+                }else{
+
+                    $ionicLoading.hide();
+                    $state.go('app.login');
+                }
+            });
+        }
+
+    //Verificar si se tiene sesion creada o si es posible crearla
+
+    $scope.iniciar = function() {
+        $state.go('app.login');
+    };
+})
+
+.controller('BienvenidaCtrl', function($scope, $state) {
+
+        $scope.iniciar = function() {
+            $state.go('app.login');
+        };
 })
 
 .controller('LoginCtrl', function($scope, $rootScope, $location, $state) {
