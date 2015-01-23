@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function($scope, $rootScope, $state, $ionicModal, $timeout) {
+.controller('AppCtrl', function($scope, $rootScope, $state, $ionicModal, $timeout, $ionicViewService) {
   // Form data for the login modal
   $scope.loginData = {};
 
@@ -24,6 +24,9 @@ angular.module('starter.controllers', [])
 // Cerrar Sesión
 $scope.cerrarSesion = function() {
     $rootScope.myDbUsers.delete();
+    $ionicViewService.nextViewOptions({
+        disableBack: true
+    });
     $state.go('app.login');
 };
 
@@ -50,7 +53,7 @@ $scope.cerrarSesion = function() {
   ];
 })
 
-.controller('InicializacionCtrl', function($scope, $rootScope, $state, $ionicLoading) {
+.controller('InicializacionCtrl', function($scope, $rootScope, $state, $ionicLoading, $ionicViewService) {
 
     $scope.loading =  $ionicLoading.show({
         template: 'Inicializando Aplicación...'
@@ -184,6 +187,10 @@ $scope.cerrarSesion = function() {
                                 $rootScope.myDbUsers.delete();
                                 $rootScope.myDbUsers.insert($rootScope.datos.cedula);
 
+                                $ionicViewService.nextViewOptions({
+                                    disableBack: true
+                                });
+
                                 $state.go('app.home');
 
                             }else{
@@ -233,7 +240,7 @@ $scope.cerrarSesion = function() {
     };
 })
 
-.controller('RecordarCtrl', function($scope, $rootScope, $location, $state, $ionicLoading) {
+.controller('RecordarCtrl', function($scope, $rootScope, $location, $state, $ionicLoading, $ionicViewService) {
 
     //Inicializar los datos de inicio
     $scope.datosInicio = {};
@@ -338,7 +345,13 @@ $scope.cerrarSesion = function() {
                         //inicializarUsuario();
                     }
 
+                    $rootScope.myDbUsers.delete();
                     $rootScope.myDbUsers.insert($rootScope.datos.cedula);
+
+                    $ionicViewService.nextViewOptions({
+                        disableBack: true
+                    });
+
                     $state.go('app.home');
 
                 }else{
@@ -358,7 +371,9 @@ $scope.cerrarSesion = function() {
     };
 })
 
-.controller('HomeCtrl', function($scope, $rootScope) {
+.controller('HomeCtrl', function($scope, $rootScope, $ionicHistory) {
+
+        //$ionicHistory.clearHistory();
 
      $scope.datosInicio = { nombre: $rootScope.datos.nombre, saldo: $rootScope.datos.saldo, cupo: $rootScope.datos.cupo,
          flexibilizacion: $rootScope.datos.flexibilizacion, segmento: $rootScope.datos.segmento };

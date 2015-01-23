@@ -98,15 +98,15 @@ angular.module('starter', ['ionic', 'starter.controllers', 'ui.router'])
       }
   })
 
-      .state('app.home', {
-          url: "/home",
-          views: {
-              'menuContent': {
-                  templateUrl: "templates/home.html",
-                  controller: 'HomeCtrl'
-              }
+  .state('app.home', {
+      url: "/home",
+      views: {
+          'menuContent': {
+              templateUrl: "templates/home.html",
+              controller: 'HomeCtrl'
           }
-      })
+      }
+  })
 
   .state('app.single', {
     url: "/playlists/:playlistId",
