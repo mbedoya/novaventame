@@ -18,7 +18,7 @@ var database_js = function(){
                 var version = '1.0';
                 var displayName = 'Novaventa Database';
                 var maxSize = 100000; //  bytes
-                felicisDB = openDatabase(shortName, version, displayName, maxSize);
+                myDB = openDatabase(shortName, version, displayName, maxSize);
 
                 console.log("database opened");
 

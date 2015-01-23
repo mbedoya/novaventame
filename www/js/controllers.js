@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+.controller('AppCtrl', function($scope, $rootScope, $state, $ionicModal, $timeout) {
   // Form data for the login modal
   $scope.loginData = {};
 
@@ -20,6 +20,12 @@ angular.module('starter.controllers', [])
   $scope.login = function() {
     $scope.modal.show();
   };
+
+// Cerrar Sesión
+$scope.cerrarSesion = function() {
+    $rootScope.myDbUsers.delete();
+    $state.go('app.login');
+};
 
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
@@ -50,29 +56,148 @@ angular.module('starter.controllers', [])
         template: 'Inicializando Aplicación...'
     });
 
-       var db = new database_js();
-        var myDbUsers;
-        db.initialize();
+        $rootScope.datos = {};
+        $rootScope.db = new database_js();
+        $rootScope.db.initialize();
 
         //Verificar si el componente de base de datos está disponible
-        if (!db.dbSupport){
+        if (!$rootScope.db.dbSupport){
 
             $ionicLoading.hide();
-            console.log(db.supportError);
+            console.log($rootScope.db.supportError);
             $state.go('app.login');
 
         }else{
 
+            //Crear objeto de usuarios
+            $rootScope.myDbUsers = new db_user_js($rootScope.db);
+
+            console.log("db users");
+            console.log($rootScope.myDbUsers);
+
             //Buscar si hay sesión iniciada
-            myDbUsers = new db_user_js(db);
-            myDbUsers.getAll(function(tx, rs){
+            $rootScope.myDbUsers.getAll(function(tx, rs){
 
                 //Hay registros en la tabla?
                 if (rs.rows.length){
 
                     $ionicLoading.hide();
+
+                    $scope.loading =  $ionicLoading.show({
+                        template: 'Iniciando sesión...'
+                    });
+
                     $rootScope.datos.cedula = rs.rows.item(0)['id'];
-                    enviarUbicacion = setInterval(ubicacion, 180000);
+
+                    var url = 'http://190.90.184.23/AntaresWebServices/InterfaceAntaresServiceService';
+                    var metodo = 'validacionAntares';
+                    var mensaje =
+                        '<SOAP-ENV:Envelope > \
+                        <SOAP-ENV:Body> \
+                        <ns1:validacionAntares > \
+                        <arg0> \
+                        <usuario>{1}</usuario> \
+                        </arg0> \
+                        <ns1:validacionAntares > \
+                        </SOAP-ENV:Body> \
+                        </SOAP-ENV:Envelope>';
+                    var soapAction = 'validacionAntares';
+
+                    mensaje = mensaje.replace("{1}", $rootScope.datos.cedula);
+
+                    var servicioSoap = new soap();
+
+                    servicioSoap.invocarMetodo(url, metodo, mensaje, soapAction,
+                        function(msg) {
+                            $ionicLoading.hide();
+                            //$.mobile.loading('hide');
+                        },function (msg) {
+
+                            $ionicLoading.hide();
+                            //$.mobile.loading('hide');
+                            //$.mobile.activePage.find("#mensajeError").html("Error en el proceso de autenticación");
+                            //$.mobile.activePage.find("#botonError").trigger("click");
+
+                        },function(data, textStatus, jqXHR) {
+
+                            //Obtener texto de rechazo, esto pasa cuando el usuario no es válido
+                            var razonRechazo = data.getElementsByTagName("razonRechazo");
+
+                            console.log(data);
+                            console.log(razonRechazo);
+
+                            //Usuario válido?
+                            if(razonRechazo != null && razonRechazo.length == 0){
+
+                                $rootScope.datos.nombre = data.getElementsByTagName("nombreCompleto")[0].textContent;
+                                $rootScope.datos.segmento = data.getElementsByTagName("clasificacionValor")[0].textContent;
+                                $rootScope.datos.cupo = data.getElementsByTagName("cupo")[0].textContent;
+                                $rootScope.datos.saldo = data.getElementsByTagName("saldoBalance")[0].textContent;
+
+                                //Obtener los valores necesarios de usuario
+                                //usuario.nombre = data.getElementsByTagName("nombreCompleto")[0].textContent;
+
+                                //var tipoUsuario = data.getElementsByTagName("tipoUsuarioList")[0].textContent;
+
+                                var rolValido = false;
+
+                                /*
+                                 switch(tipoUsuario) {
+                                 case config.servicios.antares.constantes.comodin:
+                                 usuario.rol = constantes.comodin;
+                                 rolValido = true;
+                                 break;
+                                 case config.servicios.antares.constantes.interno:
+                                 usuario.rol = constantes.interno;
+                                 rolValido = true;
+                                 break;
+                                 case config.servicios.antares.constantes.jefeNacional:
+                                 usuario.division = data.getElementsByTagName("codigoPais")[0].textContent;
+                                 usuario.region = data.getElementsByTagName("codigoRegion")[0].textContent;
+                                 usuario.rol = constantes.jefeNacional;
+                                 rolValido = true;
+                                 break;
+                                 case config.servicios.antares.constantes.jefeZonal:
+                                 usuario.region = data.getElementsByTagName("codigoRegion")[0].textContent;
+                                 usuario.zona = data.getElementsByTagName("codigoZona")[0].textContent;
+                                 usuario.rol = constantes.jefeZonal;
+                                 rolValido = true;
+                                 break;
+                                 case config.servicios.antares.constantes.gerenteZona:
+                                 usuario.region = data.getElementsByTagName("codigoRegion")[0].textContent;
+                                 usuario.zona = data.getElementsByTagName("codigoZona")[0].textContent;
+                                 usuario.rol = constantes.gerenteZona;
+                                 rolValido = true;
+                                 break;
+                                 default:
+                                 $.mobile.activePage.find("#mensajeError").html("Tu Rol no es válido para la aplicación");
+                                 $.mobile.activePage.find("#botonError").trigger("click");
+                                 break;
+                                 }
+
+                                 */
+                                if(rolValido){
+                                    //$.mobile.changePage("#paginaHome", {transition: "none"});
+                                    //inicializarUsuario();
+                                }
+
+                                $rootScope.myDbUsers.delete();
+                                $rootScope.myDbUsers.insert($rootScope.datos.cedula);
+
+                                $state.go('app.home');
+
+                            }else{
+
+
+                                console.log(razonRechazo);
+                                alert("Usuario no valido");
+
+                                //$.mobile.activePage.find("#mensajeError").html(razonRechazo);
+                                //$.mobile.activePage.find("#botonError").trigger("click");
+                            }
+                        }
+                    );
+
 
                 }else{
 
@@ -213,6 +338,7 @@ angular.module('starter.controllers', [])
                         //inicializarUsuario();
                     }
 
+                    $rootScope.myDbUsers.insert($rootScope.datos.cedula);
                     $state.go('app.home');
 
                 }else{
