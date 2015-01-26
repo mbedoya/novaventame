@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function($scope, $rootScope, $state, $ionicModal, $timeout, $ionicViewService) {
+.controller('AppCtrl', function($scope, $rootScope, $state, $ionicModal, $timeout, $ionicHistory, $location) {
   // Form data for the login modal
   $scope.loginData = {};
 
@@ -23,11 +23,15 @@ angular.module('starter.controllers', [])
 
 // Cerrar Sesión
 $scope.cerrarSesion = function() {
+    console.log("closing session");
     $rootScope.myDbUsers.delete();
-    $ionicViewService.nextViewOptions({
+    $ionicHistory.clearHistory();
+    $ionicHistory.nextViewOptions({
         disableBack: true
     });
-    $state.go('app.login');
+    //window.location.replace('/#/app/login');
+    //$state.go('app.login', {}, {reload: true});
+    $location.path( "/app/login" );
 };
 
   // Perform the login action when the user submits the login form
@@ -230,17 +234,28 @@ $scope.cerrarSesion = function() {
 
 .controller('LoginCtrl', function($scope, $rootScope, $location, $state) {
 
+    console.log('LoginCtrl iniciando');
+
     //Inicializar los datos de inicio
-    $scope.datosInicio = {};
+    $scope.datosInicio = { cedula: '' };
 
     $scope.capturarCedula = function() {
         console.log('Doing login', $scope.datosInicio);
         $rootScope.datos = $scope.datosInicio;
+        $scope.datosInicio = { cedula: '' };
         $state.go('app.recordar');
     };
+
+   $scope.$on('$routeChangeSuccess', function () {
+        console.log("Route changed");
+    });
+
+    $scope.$on('$viewContentLoaded', function readyToTrick() {
+        console.log("Login view loaded");
+    });
 })
 
-.controller('RecordarCtrl', function($scope, $rootScope, $location, $state, $ionicLoading, $ionicViewService) {
+.controller('RecordarCtrl', function($scope, $rootScope, $location, $state, $ionicLoading, $ionicViewService, $location) {
 
     //Inicializar los datos de inicio
     $scope.datosInicio = {};
@@ -250,8 +265,6 @@ $scope.cerrarSesion = function() {
         $scope.loading =  $ionicLoading.show({
             template: 'Iniciando sesión...'
         });
-
-        $scope.datosInicio = { nombre: '', saldo: 0, cupo: 0, flexibilizacion: 0, segmento: "" };
 
         var url = 'http://190.90.184.23/AntaresWebServices/InterfaceAntaresServiceService';
         var metodo = 'validacionAntares';
@@ -267,6 +280,7 @@ $scope.cerrarSesion = function() {
             </SOAP-ENV:Envelope>';
         var soapAction = 'validacionAntares';
 
+        console.log("cedula:" + $rootScope.datos.cedula);
         mensaje = mensaje.replace("{1}", $rootScope.datos.cedula);
 
         var servicioSoap = new soap();
@@ -297,6 +311,8 @@ $scope.cerrarSesion = function() {
                     $rootScope.datos.segmento = data.getElementsByTagName("clasificacionValor")[0].textContent;
                     $rootScope.datos.cupo = data.getElementsByTagName("cupo")[0].textContent;
                     $rootScope.datos.saldo = data.getElementsByTagName("saldoBalance")[0].textContent;
+
+                    console.log("Nombre:" + $rootScope.datos.nombre);
 
                     //Obtener los valores necesarios de usuario
                     //usuario.nombre = data.getElementsByTagName("nombreCompleto")[0].textContent;
@@ -352,7 +368,8 @@ $scope.cerrarSesion = function() {
                         disableBack: true
                     });
 
-                    $state.go('app.home');
+                    $location.path( "/app/home" );
+                    //$state.go('app.home', {}, {reload:true});
 
                 }else{
 
@@ -371,15 +388,28 @@ $scope.cerrarSesion = function() {
     };
 })
 
-.controller('HomeCtrl', function($scope, $rootScope, $ionicHistory) {
+.controller('HomeCtrl', function($state, $scope, $rootScope) {
 
-        //$ionicHistory.clearHistory();
+     $scope.init = function(){
 
-     $scope.datosInicio = { nombre: $rootScope.datos.nombre, saldo: $rootScope.datos.saldo, cupo: $rootScope.datos.cupo,
-         flexibilizacion: $rootScope.datos.flexibilizacion, segmento: $rootScope.datos.segmento };
+     console.log("INITIALIZAZING.." + $rootScope.datos.nombre);
 
-    //Inicializar los datos de campaña
-    $scope.campana = { numero: '01', fechaMontajePedido: 'Febrero 15' };
+      $scope.datosInicio = { nombre: $rootScope.datos.nombre, saldo: $rootScope.datos.saldo, cupo: $rootScope.datos.cupo,
+             flexibilizacion: $rootScope.datos.flexibilizacion, segmento: $rootScope.datos.segmento };
+
+
+         //Inicializar los datos de campaña
+         $scope.campana = { numero: '01', fechaMontajePedido: 'Febrero 15' };
+
+         $state.reload();
+     }
+
+     console.log("HomeCtrl iniciando..." + $rootScope.datos.nombre);
+
+        $scope.init();
+
+
+        setInterval($scope.init, 1500);
 
 })
 
