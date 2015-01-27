@@ -195,6 +195,7 @@ $scope.cerrarSesion = function() {
                                     disableBack: true
                                 });
 
+                                $rootScope.updateUI = true;
                                 $state.go('app.home');
 
                             }else{
@@ -368,8 +369,14 @@ $scope.cerrarSesion = function() {
                         disableBack: true
                     });
 
-                    $location.path( "/app/home" );
-                    //$state.go('app.home', {}, {reload:true});
+                    //$location.path( "/app/home" );
+                    $rootScope.updateUI = true;
+                    $state.go('app.home', {}, {reload:true});
+                    /*setTimeout(function(){
+                        console.log("about to reload");
+                        $state.reload();
+                        console.log("reloaded");
+                    }, 200);*/
 
                 }else{
 
@@ -390,26 +397,33 @@ $scope.cerrarSesion = function() {
 
 .controller('HomeCtrl', function($state, $scope, $rootScope) {
 
+     console.log("HOME INITIALIZAZING.." + $rootScope.datos.nombre);
+
      $scope.init = function(){
 
-     console.log("INITIALIZAZING.." + $rootScope.datos.nombre);
+         if($rootScope.updateUI){
 
-      $scope.datosInicio = { nombre: $rootScope.datos.nombre, saldo: $rootScope.datos.saldo, cupo: $rootScope.datos.cupo,
-             flexibilizacion: $rootScope.datos.flexibilizacion, segmento: $rootScope.datos.segmento };
+             $rootScope.updateUI = false;
+
+             console.log("UPDATING UI.." + $rootScope.datos.nombre);
+
+             $scope.datosInicio = { nombre: $rootScope.datos.nombre, saldo: $rootScope.datos.saldo, cupo: $rootScope.datos.cupo,
+                 flexibilizacion: $rootScope.datos.flexibilizacion, segmento: $rootScope.datos.segmento };
 
 
-         //Inicializar los datos de campaña
-         $scope.campana = { numero: '01', fechaMontajePedido: 'Febrero 15' };
+             //Inicializar los datos de campaña
+             $scope.campana = { numero: '01', fechaMontajePedido: 'Febrero 15' };
 
-         $state.reload();
+             $state.reload();
+
+         }
      }
 
      console.log("HomeCtrl iniciando..." + $rootScope.datos.nombre);
 
-        $scope.init();
+      $scope.init();
 
-
-        setInterval($scope.init, 1500);
+      setInterval($scope.init, 1000);
 
 })
 
