@@ -399,6 +399,22 @@ $scope.cerrarSesion = function() {
 
      console.log("HOME INITIALIZAZING.." + $rootScope.datos.nombre);
 
+    $scope.nombre = function(){
+      return $rootScope.datos.nombre;
+    }
+
+    $scope.segmento = function(){
+        return $rootScope.datos.segmento;
+    }
+
+    $scope.saldo = function(){
+        return $rootScope.datos.saldo;
+    }
+
+    $scope.cupo = function(){
+        return $rootScope.datos.cupo;
+    }
+
      $scope.init = function(){
 
          if($rootScope.updateUI){
@@ -421,9 +437,9 @@ $scope.cerrarSesion = function() {
 
      console.log("HomeCtrl iniciando..." + $rootScope.datos.nombre);
 
-      $scope.init();
+      //$scope.init();
 
-      setInterval($scope.init, 1000);
+      //setInterval($scope.init, 1000);
 
 })
 

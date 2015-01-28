@@ -2,18 +2,19 @@
     <ion-content>
         <div class="list" ng-init="init()">
             <label class="item item-input">
-                <span class="input-label" ng-bind="datosInicio.nombre"></span>
+                <span class="input-label" >{{ nombre() }}</span>
             </label>
             <label class="item item-input">
-                <span class="input-label">{{datosInicio.segmento}}</span>
+                <span class="input-label">Segmento</span>
+                {{ segmento() }}
             </label>
             <label class="item item-input">
                 <span class="input-label">Saldo a pagar</span>
-                {{datosInicio.saldo | currency}}
+                {{ saldo() | currency}}
             </label>
             <label class="item item-input">
                 <span class="input-label">Cupo</span>
-                {{datosInicio.cupo | currency}}
+                {{ cupo() | currency}}
             </label>
             <label class="item item-input">
                 <span class="input-label">Flexibilización</span>
