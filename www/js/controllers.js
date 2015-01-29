@@ -258,8 +258,11 @@ angular.module('starter.controllers', [])
             if(!$rootScope.datos.cedula){
                 alert("Debes ingresar la cédula");
                 return;
-                //$scope.datosInicio = { cedula: '' };
-                //$state.go('app.login', {});
+            }
+
+            if(String($rootScope.datos.cedula).length < 6 || String($rootScope.datos.cedula).length > 10){
+                alert("Debes ingresar entre 6 y 10 dígitos");
+                return;
             }
 
             $scope.loading =  $ionicLoading.show({
@@ -296,7 +299,7 @@ angular.module('starter.controllers', [])
                 },function(data, textStatus, jqXHR) {
 
                     //Obtener texto de rechazo, esto pasa cuando el usuario no es válido
-                    var razonRechazo = data.getElementsByTagName("razonRechazo");
+                    var razonRechazo = data.getElementsByTagName("razonRechazo")[0].textContent;
 
                     console.log(data);
                     console.log(razonRechazo);
@@ -352,7 +355,11 @@ angular.module('starter.controllers', [])
                     }else{
 
                         console.log(razonRechazo);
-                        alert("Lo sentimos no existe información para la cédula ingresada. Comunícate con tu Mamá Líder o la línea de atención", "Error");
+                        if(razonRechazo == "El usuario no se encuentra registrado en Antares."){
+                            alert("Lo sentimos no existe información para la cédula ingresada. Comunícate con tu Mamá Líder o la línea de atención", "Error");
+                        }else {
+                            alert(razonRechazo);
+                        }
 
                     }
                 }
