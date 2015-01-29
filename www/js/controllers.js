@@ -307,6 +307,9 @@ angular.module('starter.controllers', [])
                             case '1':
                                 rolValido = true;
                                 break;
+                            case '3':
+                                rolValido = true;
+                                break;
                         }
 
                         if(rolValido){
