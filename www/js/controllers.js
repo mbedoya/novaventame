@@ -141,7 +141,7 @@ angular.module('starter.controllers', [])
                                 $rootScope.datos.cupo = data.getElementsByTagName("cupo")[0].textContent;
                                 $rootScope.datos.saldo = data.getElementsByTagName("saldoBalance")[0].textContent;
 
-                                $rootScope.campana = {numero: '01', fechaMontajePedido:'Feb 23'};
+                                $rootScope.campana = {numero: '-', fechaMontajePedido:'-'};
 
                                 $http.get("http://200.47.173.68:9081/AntaresWebServices/interfaceAntares/getRecordatoriosAntares/" + data.getElementsByTagName("codigoZona")[0].textContent).
                                     success(function(data, status, headers, config) {
@@ -309,7 +309,7 @@ angular.module('starter.controllers', [])
                         $rootScope.datos.cupo = data.getElementsByTagName("cupo")[0].textContent;
                         $rootScope.datos.saldo = data.getElementsByTagName("saldoBalance")[0].textContent;
 
-                        $rootScope.campana = {numero: '01', fechaMontajePedido:'Feb 23'};
+                        $rootScope.campana = {numero: '-', fechaMontajePedido:'-'};
 
                         $http.get("http://200.47.173.68:9081/AntaresWebServices/interfaceAntares/getRecordatoriosAntares/" + data.getElementsByTagName("codigoZona")[0].textContent).
                             success(function(data, status, headers, config) {
