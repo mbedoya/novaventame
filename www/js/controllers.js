@@ -57,7 +57,7 @@ angular.module('starter.controllers', [])
         ];
     })
 
-    .controller('InicializacionCtrl', function($scope, $rootScope, $state, $ionicLoading, $ionicViewService) {
+    .controller('InicializacionCtrl', function($scope, $rootScope, $state, $ionicLoading, $ionicViewService, $http) {
 
         $scope.loading =  $ionicLoading.show({
             template: 'Inicializando Aplicación...'
@@ -140,6 +140,17 @@ angular.module('starter.controllers', [])
                                 $rootScope.datos.segmento = data.getElementsByTagName("clasificacionValor")[0].textContent;
                                 $rootScope.datos.cupo = data.getElementsByTagName("cupo")[0].textContent;
                                 $rootScope.datos.saldo = data.getElementsByTagName("saldoBalance")[0].textContent;
+
+                                $rootScope.campana = {numero: '01', fechaMontajePedido:'Feb 23'};
+
+                                $http.get("http://200.47.173.68:9081/AntaresWebServices/interfaceAntares/getRecordatoriosAntares/" + data.getElementsByTagName("codigoZona")[0].textContent).
+                                    success(function(data, status, headers, config) {
+                                        console.log(data);
+                                        $rootScope.campana = {numero: data.listaRecordatorios[0].campagna, fechaMontajePedido:data.listaRecordatorios[0].fecha};
+                                    }).
+                                    error(function(data, status, headers, config) {
+                                        //$rootScope.campana = {numero: '', fechaMontajePedido:''};
+                                    });
 
                                 //Obtener los valores necesarios de usuario
                                 //usuario.nombre = data.getElementsByTagName("nombreCompleto")[0].textContent;
@@ -233,7 +244,7 @@ angular.module('starter.controllers', [])
         };
     })
 
-    .controller('LoginCtrl', function($scope, $rootScope, $location, $state, $ionicLoading, $ionicViewService) {
+    .controller('LoginCtrl', function($scope, $rootScope, $location, $state, $ionicLoading, $ionicViewService, $http) {
 
         console.log('LoginCtrl iniciando');
 
@@ -297,6 +308,17 @@ angular.module('starter.controllers', [])
                         $rootScope.datos.segmento = data.getElementsByTagName("clasificacionValor")[0].textContent;
                         $rootScope.datos.cupo = data.getElementsByTagName("cupo")[0].textContent;
                         $rootScope.datos.saldo = data.getElementsByTagName("saldoBalance")[0].textContent;
+
+                        $rootScope.campana = {numero: '01', fechaMontajePedido:'Feb 23'};
+
+                        $http.get("http://200.47.173.68:9081/AntaresWebServices/interfaceAntares/getRecordatoriosAntares/" + data.getElementsByTagName("codigoZona")[0].textContent).
+                            success(function(data, status, headers, config) {
+                                console.log(data);
+                                $rootScope.campana = {numero: data.listaRecordatorios[0].campagna, fechaMontajePedido:data.listaRecordatorios[0].fecha};
+                            }).
+                            error(function(data, status, headers, config) {
+                                //$rootScope.campana = {numero: '', fechaMontajePedido:''};
+                            });
 
                         var tipoUsuario = data.getElementsByTagName("tipoUsuarioList")[0].textContent;
 
@@ -405,6 +427,9 @@ angular.module('starter.controllers', [])
                         $rootScope.datos.cupo = data.getElementsByTagName("cupo")[0].textContent;
                         $rootScope.datos.saldo = data.getElementsByTagName("saldoBalance")[0].textContent;
 
+                        $rootScope.campana.numero = '01';
+                        $rootScope.campana.fechaMontajePedido = 'Feb 23';
+
                         console.log("Nombre:" + $rootScope.datos.nombre);
 
                         //Obtener los valores necesarios de usuario
@@ -507,24 +532,12 @@ angular.module('starter.controllers', [])
             return $rootScope.datos.cupo;
         }
 
-        $scope.init = function(){
+        $scope.numeroCampana = function(){
+            return $rootScope.campana.numero;
+        }
 
-            if($rootScope.updateUI){
-
-                $rootScope.updateUI = false;
-
-                console.log("UPDATING UI.." + $rootScope.datos.nombre);
-
-                $scope.datosInicio = { nombre: $rootScope.datos.nombre, saldo: $rootScope.datos.saldo, cupo: $rootScope.datos.cupo,
-                    flexibilizacion: $rootScope.datos.flexibilizacion, segmento: $rootScope.datos.segmento };
-
-
-                //Inicializar los datos de campaña
-                $scope.campana = { numero: '01', fechaMontajePedido: 'Febrero 15' };
-
-                $state.reload();
-
-            }
+        $scope.fechaMontajePedidoCampana = function(){
+            return $rootScope.campana.fechaMontajePedido;
         }
 
         console.log("HomeCtrl iniciando..." + $rootScope.datos.nombre);
