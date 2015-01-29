@@ -299,7 +299,7 @@ angular.module('starter.controllers', [])
                 },function(data, textStatus, jqXHR) {
 
                     //Obtener texto de rechazo, esto pasa cuando el usuario no es válido
-                    var razonRechazo = data.getElementsByTagName("razonRechazo")[0].textContent;
+                    var razonRechazo = data.getElementsByTagName("razonRechazo");
 
                     console.log(data);
                     console.log(razonRechazo);
@@ -353,6 +353,8 @@ angular.module('starter.controllers', [])
                         }
 
                     }else{
+
+                        razonRechazo = data.getElementsByTagName("razonRechazo")[0].textContent;
 
                         console.log(razonRechazo);
                         if(razonRechazo == "El usuario no se encuentra registrado en Antares."){
