@@ -241,10 +241,15 @@ angular.module('starter.controllers', [])
         $scope.datosInicio = { cedula: '' };
 
         $scope.capturarCedula = function() {
-            console.log('Doing login', $scope.datosInicio);
+            console.log('Doing login ', $scope.datosInicio);
             $rootScope.datos = $scope.datosInicio;
-            //$scope.datosInicio = { cedula: '' };
-            //$state.go('app.recordar');
+
+            if(!$rootScope.datos.cedula){
+                alert("Debes ingresar la cédula");
+                return;
+                //$scope.datosInicio = { cedula: '' };
+                //$state.go('app.login', {});
+            }
 
             $scope.loading =  $ionicLoading.show({
                 template: 'Iniciando sesión...'
@@ -322,11 +327,13 @@ angular.module('starter.controllers', [])
                     }else{
 
                         console.log(razonRechazo);
-                        alert("Lo sentimos para no existe información para la cédula ingresada comunícate con tu Mamá Líder o la línea de atención");
+                        alert("Lo sentimos no existe información para la cédula ingresada. Comunícate con tu Mamá Líder o la línea de atención", "Error");
 
                     }
                 }
             );
+
+
         };
 
         $scope.$on('$routeChangeSuccess', function () {
