@@ -64,6 +64,7 @@ angular.module('starter.controllers', [])
         });
 
         $rootScope.datos = {};
+        $rootScope.configuracion = { ip_servidores: 'http://200.47.173.66:9081' };
         $rootScope.db = new database_js();
         $rootScope.db.initialize();
 
@@ -96,7 +97,7 @@ angular.module('starter.controllers', [])
 
                     $rootScope.datos.cedula = rs.rows.item(0)['id'];
 
-                    var url = 'http://190.90.184.23/AntaresWebServices/InterfaceAntaresServiceService';
+                    var url = $rootScope.configuracion.ip_servidores + '/AntaresWebServices/InterfaceAntaresServiceService';
                     var metodo = 'validacionAntares';
                     var mensaje =
                         '<SOAP-ENV:Envelope > \
@@ -143,7 +144,7 @@ angular.module('starter.controllers', [])
 
                                 $rootScope.campana = {numero: '-', fechaMontajePedido:'-'};
 
-                                $http.get("http://200.47.173.68:9081/AntaresWebServices/interfaceAntares/getRecordatoriosAntares/" + data.getElementsByTagName("codigoZona")[0].textContent).
+                                $http.get($rootScope.configuracion.ip_servidores +  "/AntaresWebServices/interfaceAntares/getRecordatoriosAntares/" + data.getElementsByTagName("codigoZona")[0].textContent).
                                     success(function(data, status, headers, config) {
                                         console.log(data);
                                         $rootScope.campana = {numero: data.listaRecordatorios[0].campagna, fechaMontajePedido:data.listaRecordatorios[0].fecha};
@@ -255,13 +256,24 @@ angular.module('starter.controllers', [])
             console.log('Doing login ', $scope.datosInicio);
             $rootScope.datos = $scope.datosInicio;
 
+
+            //VALIDACIONE DE FORMATO DE CÉDULA
+
+            //Cédula vacía
             if(!$rootScope.datos.cedula){
                 alert("Debes ingresar la cédula");
                 return;
             }
 
+            //Cantidad de caracteres
             if(String($rootScope.datos.cedula).length < 6 || String($rootScope.datos.cedula).length > 10){
                 alert("Debes ingresar entre 6 y 10 dígitos");
+                return;
+            }
+
+            //Caracteres especiales
+            if(String($rootScope.datos.cedula).indexOf(".") >= 0 || String($rootScope.datos.cedula).indexOf(",") >= 0){
+                alert("Debes ingresar sólo dígitos");
                 return;
             }
 
@@ -269,7 +281,7 @@ angular.module('starter.controllers', [])
                 template: 'Iniciando sesión...'
             });
 
-            var url = 'http://190.90.184.23/AntaresWebServices/InterfaceAntaresServiceService';
+            var url = $rootScope.configuracion.ip_servidores + '/AntaresWebServices/InterfaceAntaresServiceService';
             var metodo = 'validacionAntares';
             var mensaje =
                 '<SOAP-ENV:Envelope > \
@@ -311,7 +323,7 @@ angular.module('starter.controllers', [])
 
                         $rootScope.campana = {numero: '-', fechaMontajePedido:'-'};
 
-                        $http.get("http://200.47.173.68:9081/AntaresWebServices/interfaceAntares/getRecordatoriosAntares/" + data.getElementsByTagName("codigoZona")[0].textContent).
+                        $http.get($rootScope.configuracion.ip_servidores + "/AntaresWebServices/interfaceAntares/getRecordatoriosAntares/" + data.getElementsByTagName("codigoZona")[0].textContent).
                             success(function(data, status, headers, config) {
                                 console.log(data);
                                 $rootScope.campana = {numero: data.listaRecordatorios[0].campagna, fechaMontajePedido:data.listaRecordatorios[0].fecha};
@@ -323,7 +335,6 @@ angular.module('starter.controllers', [])
                         var tipoUsuario = data.getElementsByTagName("tipoUsuarioList")[0].textContent;
 
                         var rolValido = false;
-
 
                         switch(tipoUsuario) {
                             case '1':
@@ -383,144 +394,32 @@ angular.module('starter.controllers', [])
 
         $scope.capturarRecordar = function() {
 
-            $scope.loading =  $ionicLoading.show({
-                template: 'Iniciando sesión...'
-            });
-
-            var url = 'http://190.90.184.23/AntaresWebServices/InterfaceAntaresServiceService';
-            var metodo = 'validacionAntares';
-            var mensaje =
-                '<SOAP-ENV:Envelope > \
-                <SOAP-ENV:Body> \
-                <ns1:validacionAntares > \
-                <arg0> \
-                <usuario>{1}</usuario> \
-                </arg0> \
-                <ns1:validacionAntares > \
-                </SOAP-ENV:Body> \
-                </SOAP-ENV:Envelope>';
-            var soapAction = 'validacionAntares';
-
-            console.log("cedula:" + $rootScope.datos.cedula);
-            mensaje = mensaje.replace("{1}", $rootScope.datos.cedula);
-
-            var servicioSoap = new soap();
-
-            servicioSoap.invocarMetodo(url, metodo, mensaje, soapAction,
-                function(msg) {
-                    $ionicLoading.hide();
-                    //$.mobile.loading('hide');
-                },function (msg) {
-
-                    $ionicLoading.hide();
-                    //$.mobile.loading('hide');
-                    //$.mobile.activePage.find("#mensajeError").html("Error en el proceso de autenticación");
-                    //$.mobile.activePage.find("#botonError").trigger("click");
-
-                },function(data, textStatus, jqXHR) {
-
-                    //Obtener texto de rechazo, esto pasa cuando el usuario no es válido
-                    var razonRechazo = data.getElementsByTagName("razonRechazo");
-
-                    console.log(data);
-                    console.log(razonRechazo);
-
-                    //Usuario válido?
-                    if(razonRechazo != null && razonRechazo.length == 0){
-
-                        $rootScope.datos.nombre = data.getElementsByTagName("nombreCompleto")[0].textContent;
-                        $rootScope.datos.segmento = data.getElementsByTagName("clasificacionValor")[0].textContent;
-                        $rootScope.datos.cupo = data.getElementsByTagName("cupo")[0].textContent;
-                        $rootScope.datos.saldo = data.getElementsByTagName("saldoBalance")[0].textContent;
-
-                        $rootScope.campana.numero = '01';
-                        $rootScope.campana.fechaMontajePedido = 'Feb 23';
-
-                        console.log("Nombre:" + $rootScope.datos.nombre);
-
-                        //Obtener los valores necesarios de usuario
-                        //usuario.nombre = data.getElementsByTagName("nombreCompleto")[0].textContent;
-
-                        //var tipoUsuario = data.getElementsByTagName("tipoUsuarioList")[0].textContent;
-
-                        var rolValido = false;
-
-                        /*
-                         switch(tipoUsuario) {
-                         case config.servicios.antares.constantes.comodin:
-                         usuario.rol = constantes.comodin;
-                         rolValido = true;
-                         break;
-                         case config.servicios.antares.constantes.interno:
-                         usuario.rol = constantes.interno;
-                         rolValido = true;
-                         break;
-                         case config.servicios.antares.constantes.jefeNacional:
-                         usuario.division = data.getElementsByTagName("codigoPais")[0].textContent;
-                         usuario.region = data.getElementsByTagName("codigoRegion")[0].textContent;
-                         usuario.rol = constantes.jefeNacional;
-                         rolValido = true;
-                         break;
-                         case config.servicios.antares.constantes.jefeZonal:
-                         usuario.region = data.getElementsByTagName("codigoRegion")[0].textContent;
-                         usuario.zona = data.getElementsByTagName("codigoZona")[0].textContent;
-                         usuario.rol = constantes.jefeZonal;
-                         rolValido = true;
-                         break;
-                         case config.servicios.antares.constantes.gerenteZona:
-                         usuario.region = data.getElementsByTagName("codigoRegion")[0].textContent;
-                         usuario.zona = data.getElementsByTagName("codigoZona")[0].textContent;
-                         usuario.rol = constantes.gerenteZona;
-                         rolValido = true;
-                         break;
-                         default:
-                         $.mobile.activePage.find("#mensajeError").html("Tu Rol no es válido para la aplicación");
-                         $.mobile.activePage.find("#botonError").trigger("click");
-                         break;
-                         }
-
-                         */
-                        if(rolValido){
-                            //$.mobile.changePage("#paginaHome", {transition: "none"});
-                            //inicializarUsuario();
-                        }
-
-                        $rootScope.myDbUsers.delete();
-                        $rootScope.myDbUsers.insert($rootScope.datos.cedula);
-
-                        $ionicViewService.nextViewOptions({
-                            disableBack: true
-                        });
-
-                        //$location.path( "/app/home" );
-                        $rootScope.updateUI = true;
-                        $state.go('app.home', {}, {reload:true});
-                        /*setTimeout(function(){
-                         console.log("about to reload");
-                         $state.reload();
-                         console.log("reloaded");
-                         }, 200);*/
-
-                    }else{
-
-
-                        console.log(razonRechazo);
-                        alert("Usuario no valido");
-
-                        //$.mobile.activePage.find("#mensajeError").html(razonRechazo);
-                        //$.mobile.activePage.find("#botonError").trigger("click");
-                    }
-                }
-            );
-
-
-
         };
     })
 
     .controller('HomeCtrl', function($state, $scope, $rootScope) {
 
         console.log("HOME INITIALIZAZING.." + $rootScope.datos.nombre);
+
+        $scope.mostrarCupo = function(){
+            return Number($rootScope.datos.cupo) > 0;
+        }
+
+        $scope.etiquetaSaldo = function(){
+
+            var etiqueta = "Saldo a pagar";
+
+            if($rootScope.datos && $rootScope.datos.saldo){
+                if(Number($rootScope.datos.saldo) < 0) {
+                    etiqueta = "Saldo a favor";
+                    //$rootScope.datos.saldo = $rootScope.datos.saldo *-1;
+                }else{
+                    etiqueta = "Saldo a pagar";
+                }
+            }
+
+            return etiqueta;
+        }
 
         $scope.nombre = function(){
             return $rootScope.datos.nombre;

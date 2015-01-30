@@ -9,10 +9,10 @@
                 {{ segmento() }}
             </label>
             <label class="item item-input">
-                <span class="input-label">Saldo a pagar</span>
-                {{ saldo() | currency}}
+                <span class="input-label" ng-bind="etiquetaSaldo()"></span>
+                {{ saldo().replace("-","") | currency}}
             </label>
-            <label class="item item-input">
+            <label class="item item-input" ng-show="mostrarCupo()">
                 <span class="input-label">Cupo</span>
                 {{ cupo() | currency}}
             </label>
